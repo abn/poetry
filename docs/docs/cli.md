@@ -34,8 +34,7 @@ my-package
 ├── my_package
 │   └── __init__.py
 └── tests
-    ├── __init__.py
-    └── test_my_package.py
+    └── __init__.py
 ```
 
 If you want to name your project differently than the folder, you can pass
@@ -61,8 +60,27 @@ my-package
 │   └── my_package
 │       └── __init__.py
 └── tests
-    ├── __init__.py
-    └── test_my_package.py
+    └── __init__.py
+```
+
+The `--name` option is smart enough to detect namespace packages and create
+the required structure for you.
+
+```bash
+poetry new --src --name my.package my-package
+```
+
+will create the following structure:
+
+```text
+my-package
+├── pyproject.toml
+├── src
+│   └── my
+│       └── package
+│           └── __init__.py
+└── tests
+    └── __init__.py
 ```
 
 ## init
