@@ -1,16 +1,18 @@
+from typing import TYPE_CHECKING
+from typing import Optional
+
 from tomlkit import dumps
+from tomlkit import inline_table
 from tomlkit import loads
 from tomlkit import table
 
+from poetry.utils._compat import Path  # noqa
+from poetry.utils.helpers import canonicalize_name
 from poetry.utils.helpers import module_name
 
 
-TESTS_DEFAULT = u"""from {package_name} import __version__
-
-
-def test_version():
-    assert __version__ == '{version}'
-"""
+if TYPE_CHECKING:
+    from tomlkit.items import InlineTable  # noqa
 
 
 POETRY_DEFAULT = """\
@@ -19,27 +21,16 @@ name = ""
 version = ""
 description = ""
 authors = []
-
-[tool.poetry.dependencies]
-
-[tool.poetry.dev-dependencies]
-"""
-
-POETRY_WITH_LICENSE = """\
-[tool.poetry]
-name = ""
-version = ""
-description = ""
-authors = []
 license = ""
+packages = []
 
 [tool.poetry.dependencies]
 
 [tool.poetry.dev-dependencies]
 """
 
-BUILD_SYSTEM_MIN_VERSION = "1.0.0a5"
-BUILD_SYSTEM_MAX_VERSION = None
+BUILD_SYSTEM_MIN_VERSION = None  # type: Optional[str]
+BUILD_SYSTEM_MAX_VERSION = None  # type: Optional[str]
 
 
 class Layout(object):
@@ -50,13 +41,16 @@ class Layout(object):
         description="",
         readme_format="md",
         author=None,
-        license=None,
+        license=None,  # noqa
         python="*",
         dependencies=None,
         dev_dependencies=None,
     ):
-        self._project = project
-        self._package_name = module_name(project)
+        self._project = canonicalize_name(project).replace(".", "-")
+        self._package_path_relative = Path(
+            *(module_name(part) for part in canonicalize_name(project).split("."))
+        )
+        self._package_name = ".".join(self._package_path_relative.parts)
         self._version = version
         self._description = description
         self._readme_format = readme_format
@@ -69,6 +63,30 @@ class Layout(object):
             author = "Your Name <you@example.com>"
 
         self._author = author
+
+    @property
+    def basedir(self):  # type: () -> Path
+        return Path()
+
+    @property
+    def package_path(self):  # type: () -> Path
+        return self.basedir / self._package_path_relative
+
+    def get_package_include(self):  # type: () -> Optional['InlineTable']
+        package = inline_table()
+
+        include = self._package_path_relative.parts[0]
+        package.append("include", include)
+
+        if self.basedir != Path():
+            package.append("from", self.basedir.as_posix())
+        else:
+            if include == self._project:
+                # package include and package name are the same,
+                # packages table is redundant here.
+                return None
+
+        return package
 
     def create(self, path, with_tests=True):
         path.mkdir(parents=True, exist_ok=True)
@@ -83,17 +101,25 @@ class Layout(object):
 
     def generate_poetry_content(self):
         template = POETRY_DEFAULT
-        if self._license:
-            template = POETRY_WITH_LICENSE
 
         content = loads(template)
+
         poetry_content = content["tool"]["poetry"]
         poetry_content["name"] = self._project
         poetry_content["version"] = self._version
         poetry_content["description"] = self._description
         poetry_content["authors"].append(self._author)
+
         if self._license:
             poetry_content["license"] = self._license
+        else:
+            poetry_content.remove("license")
+
+        packages = self.get_package_include()
+        if packages:
+            poetry_content["packages"].append(packages)
+        else:
+            poetry_content.remove("packages")
 
         poetry_content["dependencies"]["python"] = self._python
 
@@ -105,9 +131,14 @@ class Layout(object):
 
         # Add build system
         build_system = table()
-        build_system_version = ">=" + BUILD_SYSTEM_MIN_VERSION
+        build_system_version = ""
+
+        if BUILD_SYSTEM_MIN_VERSION is not None:
+            build_system_version = ">=" + BUILD_SYSTEM_MIN_VERSION
         if BUILD_SYSTEM_MAX_VERSION is not None:
-            build_system_version += ",<" + BUILD_SYSTEM_MAX_VERSION
+            if build_system_version:
+                build_system_version += ","
+            build_system_version += "<" + BUILD_SYSTEM_MAX_VERSION
 
         build_system.add("requires", ["poetry-core" + build_system_version])
         build_system.add("build-backend", "poetry.core.masonry.api")
@@ -116,8 +147,12 @@ class Layout(object):
 
         return dumps(content)
 
-    def _create_default(self, path, src=True):
-        raise NotImplementedError()
+    def _create_default(self, path):
+        package_path = path / self.package_path
+        package_path.mkdir(parents=True)
+
+        package_init = package_path / "__init__.py"
+        package_init.touch()
 
     def _create_readme(self, path):
         if self._readme_format == "rst":
@@ -127,20 +162,13 @@ class Layout(object):
 
         readme_file.touch()
 
-    def _create_tests(self, path):
+    @staticmethod
+    def _create_tests(path):
         tests = path / "tests"
-        tests_init = tests / "__init__.py"
-        tests_default = tests / "test_{}.py".format(self._package_name)
-
         tests.mkdir()
-        tests_init.touch(exist_ok=False)
 
-        with tests_default.open("w", encoding="utf-8") as f:
-            f.write(
-                TESTS_DEFAULT.format(
-                    package_name=self._package_name, version=self._version
-                )
-            )
+        tests_init = tests / "__init__.py"
+        tests_init.touch()
 
     def _write_poetry(self, path):
         content = self.generate_poetry_content()
