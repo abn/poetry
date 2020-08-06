@@ -35,6 +35,7 @@ version = "1.2.3"
 description = "This is a description"
 authors = ["Your Name <you@example.com>"]
 license = "MIT"
+readme = "README.md"
 packages = [{include = "my_package"}]
 
 [tool.poetry.dependencies]
@@ -87,6 +88,7 @@ version = "1.2.3"
 description = "This is a description"
 authors = ["Your Name <you@example.com>"]
 license = "MIT"
+readme = "README.md"
 packages = [{include = "my_package"}]
 
 [tool.poetry.dependencies]
@@ -128,6 +130,7 @@ name = "my-package"
 version = "1.2.3"
 description = ""
 authors = ["Your Name <you@example.com>"]
+readme = "README.md"
 packages = [{{include = "my_package"}}]
 
 [tool.poetry.dependencies]
@@ -180,6 +183,7 @@ version = "1.2.3"
 description = "This is a description"
 authors = ["Your Name <you@example.com>"]
 license = "MIT"
+readme = "README.md"
 packages = [{include = "my_package"}]
 
 [tool.poetry.dependencies]
@@ -233,6 +237,7 @@ version = "1.2.3"
 description = "This is a description"
 authors = ["Your Name <you@example.com>"]
 license = "MIT"
+readme = "README.md"
 packages = [{include = "my_package"}]
 
 [tool.poetry.dependencies]
@@ -286,6 +291,7 @@ version = "1.2.3"
 description = "This is a description"
 authors = ["Your Name <you@example.com>"]
 license = "MIT"
+readme = "README.md"
 packages = [{include = "my_package"}]
 
 [tool.poetry.dependencies]
@@ -339,6 +345,7 @@ version = "1.2.3"
 description = "This is a description"
 authors = ["Your Name <you@example.com>"]
 license = "MIT"
+readme = "README.md"
 packages = [{include = "my_package"}]
 
 [tool.poetry.dependencies]
@@ -392,6 +399,7 @@ version = "1.2.3"
 description = "This is a description"
 authors = ["Your Name <you@example.com>"]
 license = "MIT"
+readme = "README.md"
 packages = [{include = "my_package"}]
 
 [tool.poetry.dependencies]
@@ -443,6 +451,7 @@ version = "1.2.3"
 description = "This is a description"
 authors = ["Your Name <you@example.com>"]
 license = "MIT"
+readme = "README.md"
 packages = [{include = "my_package"}]
 
 [tool.poetry.dependencies]
@@ -484,6 +493,7 @@ version = "1.2.3"
 description = "This is a description"
 authors = ["Your Name <you@example.com>"]
 license = "MIT"
+readme = "README.md"
 packages = [{include = "my_package"}]
 
 [tool.poetry.dependencies]

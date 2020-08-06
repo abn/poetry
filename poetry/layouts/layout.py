@@ -22,6 +22,7 @@ version = ""
 description = ""
 authors = []
 license = ""
+readme = ""
 packages = []
 
 [tool.poetry.dependencies]
@@ -34,6 +35,8 @@ BUILD_SYSTEM_MAX_VERSION = None  # type: Optional[str]
 
 
 class Layout(object):
+    ACCEPTED_README_FORMATS = {"md", "rst"}
+
     def __init__(
         self,
         project,
@@ -53,7 +56,15 @@ class Layout(object):
         self._package_name = ".".join(self._package_path_relative.parts)
         self._version = version
         self._description = description
-        self._readme_format = readme_format
+
+        self._readme_format = readme_format.lower()
+        if self._readme_format not in self.ACCEPTED_README_FORMATS:
+            raise ValueError(
+                "Invalid readme format '{}', use one of {}.".format(
+                    readme_format, ", ".join(self.ACCEPTED_README_FORMATS)
+                )
+            )
+
         self._license = license
         self._python = python
         self._dependencies = dependencies or {}
@@ -115,6 +126,7 @@ class Layout(object):
         else:
             poetry_content.remove("license")
 
+        poetry_content["readme"] = "README.{}".format(self._readme_format)
         packages = self.get_package_include()
         if packages:
             poetry_content["packages"].append(packages)
@@ -154,13 +166,10 @@ class Layout(object):
         package_init = package_path / "__init__.py"
         package_init.touch()
 
-    def _create_readme(self, path):
-        if self._readme_format == "rst":
-            readme_file = path / "README.rst"
-        else:
-            readme_file = path / "README.md"
-
+    def _create_readme(self, path):  # type: (Path) -> Path
+        readme_file = path.joinpath("README.{}".format(self._readme_format))
         readme_file.touch()
+        return readme_file
 
     @staticmethod
     def _create_tests(path):
