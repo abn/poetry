@@ -1,3 +1,5 @@
+from typing import Optional
+
 import pytest
 
 from cleo.testers import CommandTester
@@ -15,7 +17,9 @@ def command(app, poetry):  # type: (Application, Poetry) -> CommandTester
     return CommandTester(command)
 
 
-def verify_project_directory(path, package_name, package_path, include_from=None):
+def verify_project_directory(
+    path, package_name, package_path, include_from=None
+):  # type: (Path, str, str, Optional[str]) -> Poetry
     package_path = Path(package_path)
     assert path.is_dir()
 
@@ -46,6 +50,8 @@ def verify_project_directory(path, package_name, package_path, include_from=None
     else:
         assert len(packages) == 1
         assert packages[0] == package_include
+
+    return poetry
 
 
 @pytest.mark.parametrize(
@@ -140,3 +146,15 @@ def test_command_new(
     options.append(path.as_posix())
     command.execute(" ".join(options))
     verify_project_directory(path, package_name, package_path, include_from)
+
+
+@pytest.mark.parametrize("fmt", [(None,), ("md",), ("rst",)])
+def test_command_new_with_readme(fmt, command, tmp_dir):
+    fmt = "md"
+    package = "package"
+    path = Path(tmp_dir) / package
+    options = ["--readme {}".format(fmt) if fmt else "md", path.as_posix()]
+    command.execute(" ".join(options))
+
+    poetry = verify_project_directory(path, package, package, None)
+    assert poetry.local_config.get("readme") == "README.{}".format(fmt or "md")
