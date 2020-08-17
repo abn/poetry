@@ -170,7 +170,7 @@ def test_info_setup_simple(mocker, demo_setup):
 def test_info_setup_simple_py2(mocker, demo_setup):
     spy = mocker.spy(VirtualEnv, "run")
     info = PackageInfo.from_directory(demo_setup)
-    assert spy.call_count == 2
+    assert spy.call_count == 1
     demo_check_info(info, requires_dist={"package"})
 
 
@@ -234,7 +234,7 @@ def test_info_setup_missing_mandatory_should_trigger_pep517(
     except PackageInfoError:
         assert spy.call_count == 3
     else:
-        assert spy.call_count == 2
+        assert spy.call_count == 1
 
 
 def test_info_prefer_poetry_config_over_egg_info():
