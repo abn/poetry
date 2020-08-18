@@ -7,6 +7,7 @@ import pytest
 
 from clikit.io import NullIO
 
+from deepdiff import DeepDiff
 from poetry.core.packages import ProjectPackage
 from poetry.factory import Factory
 from poetry.installation import Installer as BaseInstaller
@@ -382,7 +383,7 @@ def test_run_install_remove_untracked(installer, locker, repo, package, installe
     installed.add_package(package_b)
     installed.add_package(package_c)
     installed.add_package(package_pip)
-    installed.add_package(package_setuptools)  # Always required and never removed.
+    installed.add_package(package_setuptools)
     installed.add_package(package)  # Root package never removed.
 
     package.add_dependency(Factory.create_dependency("A", "~1.0"))
@@ -392,8 +393,10 @@ def test_run_install_remove_untracked(installer, locker, repo, package, installe
 
     assert 0 == installer.executor.installations_count
     assert 0 == installer.executor.updates_count
-    assert 3 == installer.executor.removals_count
-    assert {"b", "c", "pip"} == set(r.name for r in installer.executor.removals)
+    assert 4 == installer.executor.removals_count
+    assert {"b", "c", "pip", "setuptools"} == set(
+        r.name for r in installer.executor.removals
+    )
 
 
 def test_run_whitelist_add(installer, locker, repo, package):
@@ -780,7 +783,7 @@ def test_installer_with_pypi_repository(package, locker, installed, config):
 
     expected = fixture("with-pypi-repository")
 
-    assert locker.written_data == expected
+    assert not DeepDiff(locker.written_data, expected, ignore_order=True)
 
 
 def test_run_installs_with_local_file(installer, locker, repo, package):
@@ -1561,7 +1564,7 @@ def test_installer_required_extras_should_not_be_removed_when_updating_single_de
     installer.whitelist(["pytest"])
     installer.run()
 
-    assert (6 if not PY2 else 7) == installer.executor.installations_count
+    assert (7 if not PY2 else 8) == installer.executor.installations_count
     assert 0 == installer.executor.updates_count
     assert 0 == installer.executor.removals_count
 

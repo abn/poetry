@@ -52,7 +52,7 @@ class Indicator(ProgressIndicator):
 
 class Provider:
 
-    UNSAFE_PACKAGES = {"setuptools"}
+    UNSAFE_PACKAGES = set()
 
     def __init__(
         self, package, pool, io, env=None

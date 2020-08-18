@@ -201,6 +201,31 @@ ssh = ["bcrypt (>=3.1.5)"]
 test = ["pytest (>=3.6.0,<3.9.0 || >3.9.0,<3.9.1 || >3.9.1,<3.9.2 || >3.9.2)", "pretend", "iso8601", "pytz", "hypothesis (>=1.11.4,<3.79.2 || >3.79.2)"]
 
 [[package]]
+name = "deepdiff"
+version = "3.3.0"
+description = "Deep Difference and Search of any Python object/data."
+category = "dev"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+jsonpickle = "*"
+
+[[package]]
+name = "deepdiff"
+version = "5.0.2"
+description = "Deep Difference and Search of any Python object/data."
+category = "dev"
+optional = false
+python-versions = ">=3.5"
+
+[package.dependencies]
+ordered-set = ">=4.0.1"
+
+[package.extras]
+murmur = ["mmh3"]
+
+[[package]]
 name = "distlib"
 version = "0.3.1"
 description = "Distribution utilities"
@@ -371,6 +396,22 @@ python-versions = ">=3.5"
 dev = ["testpath"]
 
 [[package]]
+name = "jsonpickle"
+version = "1.4.1"
+description = "Python library for serializing any arbitrary object graph into JSON"
+category = "dev"
+optional = false
+python-versions = ">=2.7"
+
+[package.dependencies]
+importlib-metadata = "*"
+
+[package.extras]
+docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
+testing = ["coverage (<5)", "pytest (>=3.5,<3.7.3 || >3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pytest-black-multipy", "pytest-cov", "ecdsa", "feedparser", "numpy", "pandas", "pymongo", "sqlalchemy", "enum34", "jsonlib"]
+"testing.libs" = ["demjson", "simplejson", "ujson", "yajl"]
+
+[[package]]
 name = "keyring"
 version = "18.0.1"
 description = "Store and access your passwords safely."
@@ -489,6 +530,14 @@ description = "Node.js virtual environment builder"
 category = "dev"
 optional = false
 python-versions = "*"
+
+[[package]]
+name = "ordered-set"
+version = "4.0.2"
+description = "A set that remembers its order, and allows looking up its items by their index in that order."
+category = "dev"
+optional = false
+python-versions = ">=3.5"
 
 [[package]]
 name = "packaging"
@@ -908,9 +957,6 @@ category = "main"
 optional = false
 python-versions = "*"
 
-[package.dependencies]
-typing = {version = ">=3.7.4", markers = "python_version < \"3.5\""}
-
 [[package]]
 name = "urllib3"
 version = "1.25.10"
@@ -982,7 +1028,7 @@ testing = ["pathlib2", "unittest2", "jaraco.itertools", "func-timeout"]
 [metadata]
 lock-version = "1.1"
 python-versions = "~2.7 || ^3.5"
-content-hash = "147ef9a61f96f4943c6c8f48cb6d0863b6f614612cf658dbb60e0546e4e7d349"
+content-hash = "e0776d7d3bcfdc21000c317e4cf156adf2fe906e75822e5c0a72dca3a7320061"
 
 [metadata.files]
 appdirs = [
@@ -1143,6 +1189,13 @@ cryptography = [
     {file = "cryptography-3.1.1-cp38-cp38-win_amd64.whl", hash = "sha256:99d4984aabd4c7182050bca76176ce2dbc9fa9748afe583a7865c12954d714ba"},
     {file = "cryptography-3.1.1.tar.gz", hash = "sha256:9d9fc6a16357965d282dd4ab6531013935425d0dc4950df2e0cf2a1b1ac1017d"},
 ]
+deepdiff = [
+    {file = "deepdiff-3.3.0-py2-none-any.whl", hash = "sha256:b4150052e610b231885c4c0be3eea86e4c029df91550ec51b9fc14dd209a5055"},
+    {file = "deepdiff-3.3.0-py3-none-any.whl", hash = "sha256:152b29dd9cd97cc78403121fb394925ec47377d4a410751e56547c3930ba2b39"},
+    {file = "deepdiff-3.3.0.tar.gz", hash = "sha256:ecad8e16a96ffd27e8f40c9801a6ab16ec6a7e7e6e6859a7710ba4695f22702c"},
+    {file = "deepdiff-5.0.2-py3-none-any.whl", hash = "sha256:273b18d32bb9b956548290b2e3ddf79c515def2dd5738965f4348ae813e710c5"},
+    {file = "deepdiff-5.0.2.tar.gz", hash = "sha256:e2b74af4da0ef9cd338bb6e8c97242c1ec9d81fcb28298d7bb24acdc19ea79d7"},
+]
 distlib = [
     {file = "distlib-0.3.1-py2.py3-none-any.whl", hash = "sha256:8c09de2c67b3e7deef7184574fc060ab8a793e7adbb183d942c389c8b13c52fb"},
     {file = "distlib-0.3.1.zip", hash = "sha256:edf6116872c863e1aa9d5bb7cb5e05a022c519a4594dc703843343a9ddd9bff1"},
@@ -1206,6 +1259,10 @@ jeepney = [
     {file = "jeepney-0.4.3-py3-none-any.whl", hash = "sha256:d6c6b49683446d2407d2fe3acb7a368a77ff063f9182fe427da15d622adc24cf"},
     {file = "jeepney-0.4.3.tar.gz", hash = "sha256:3479b861cc2b6407de5188695fa1a8d57e5072d7059322469b62628869b8e36e"},
 ]
+jsonpickle = [
+    {file = "jsonpickle-1.4.1-py2.py3-none-any.whl", hash = "sha256:8919c166bac0574e3d74425c7559434062002d9dfc0ac2afa6dc746ba4a19439"},
+    {file = "jsonpickle-1.4.1.tar.gz", hash = "sha256:e8d4b7cd0bd6826001a74377df1079a76ad8bae0f909282de2554164c837c8ba"},
+]
 keyring = [
     {file = "keyring-18.0.1-py2.py3-none-any.whl", hash = "sha256:7b29ebfcf8678c4da531b2478a912eea01e80007e5ddca9ee0c7038cb3489ec6"},
     {file = "keyring-18.0.1.tar.gz", hash = "sha256:67d6cc0132bd77922725fae9f18366bb314fd8f95ff4d323a4df41890a96a838"},
@@ -1254,6 +1311,9 @@ msgpack = [
 nodeenv = [
     {file = "nodeenv-1.5.0-py2.py3-none-any.whl", hash = "sha256:5304d424c529c997bc888453aeaa6362d242b6b4631e90f3d4bf1b290f1c84a9"},
     {file = "nodeenv-1.5.0.tar.gz", hash = "sha256:ab45090ae383b716c4ef89e690c41ff8c2b257b85b309f01f3654df3d084bd7c"},
+]
+ordered-set = [
+    {file = "ordered-set-4.0.2.tar.gz", hash = "sha256:ba93b2df055bca202116ec44b9bead3df33ea63a7d5827ff8e16738b97f33a95"},
 ]
 packaging = [
     {file = "packaging-20.4-py2.py3-none-any.whl", hash = "sha256:998416ba6962ae7fbd6596850b80e17859a5753ba17c32284f67bfff33784181"},
