@@ -14,6 +14,7 @@ from poetry.utils.env import EnvManager
 from poetry.utils.env import VirtualEnv
 from poetry.utils.helpers import safe_rmtree
 from poetry.utils.helpers import temporary_directory
+from poetry.utils.pip import pip_editable_install
 
 
 try:
@@ -235,14 +236,13 @@ class PipInstaller(BaseInstaller):
 
                 with builder.setup_py():
                     if package.develop:
-                        args.append("-e")
-
+                        return pip_editable_install(req, self._env)
                     args.append(req)
 
                     return self.run(*args)
 
         if package.develop:
-            args.append("-e")
+            return pip_editable_install(req, self._env)
 
         args.append(req)
 
