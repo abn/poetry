@@ -1,4 +1,9 @@
+import os
+
+from typing import Union
+
 from poetry.exceptions import PoetryException
+from poetry.utils._compat import PY2
 from poetry.utils._compat import Path
 from poetry.utils.env import Env
 from poetry.utils.env import ephemeral_environment
@@ -6,10 +11,10 @@ from poetry.utils.env import ephemeral_environment
 
 def pip_install(
     path, environment, editable=False, deps=False, upgrade=False
-):  # type: (Path, Env, bool, bool, bool) -> None
+):  # type: (Union[Path, str], Env, bool, bool, bool) -> None
     path = Path(path) if isinstance(path, str) else path
 
-    args = ["pip", "install", "--prefix", str(environment.path)]
+    args = ["install", "--prefix", str(environment.path)]
 
     if upgrade:
         args.append("--upgrade")
@@ -26,10 +31,17 @@ def pip_install(
 
     args.append(str(path))
 
+    if path.is_file() and path.suffix == ".whl":
+        return environment.run_pip(*args)
+
     with ephemeral_environment(
         executable=environment.python, pip=True, setuptools=True
     ) as env:
-        return env.run(*args)
+        return env.run(
+            "pip",
+            *args,
+            env=dict(os.environ, PYTHONPATH=str(environment.purelib)) if PY2 else None
+        )
 
 
 def pip_editable_install(directory, environment):  # type: (Path, Env) -> None

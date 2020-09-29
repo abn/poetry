@@ -60,7 +60,7 @@ def test_execute_executes_a_batch_of_operations(
     mocker, config, pool, io, tmp_dir, mock_file_downloads
 ):
     pip_editable_install = mocker.patch(
-        "poetry.installation.executor.pip_editable_install"
+        "poetry.installation.executor.pip_editable_install", unsafe=not PY36
     )
 
     config = Config()
