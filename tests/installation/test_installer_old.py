@@ -5,8 +5,8 @@ import sys
 import pytest
 
 from clikit.io import NullIO
-
 from deepdiff import DeepDiff
+
 from poetry.core.packages import ProjectPackage
 from poetry.factory import Factory
 from poetry.installation import Installer as BaseInstaller

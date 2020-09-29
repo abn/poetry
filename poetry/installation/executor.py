@@ -20,6 +20,7 @@ from poetry.utils._compat import cpu_count
 from poetry.utils._compat import decode
 from poetry.utils.env import EnvCommandError
 from poetry.utils.helpers import safe_rmtree
+from poetry.utils.pip import pip_editable_install
 
 from .authenticator import Authenticator
 from .chef import Chef
@@ -523,14 +524,15 @@ class Executor(object):
 
                 with builder.setup_py():
                     if package.develop:
-                        args.append("-e")
+                        return pip_editable_install(req, self._env)
 
                     args.append(req)
 
                     return self.run_pip(*args)
 
         if package.develop:
-            args.append("-e")
+            print("DEVELOPING")
+            return pip_editable_install(req, self._env)
 
         args.append(req)
 

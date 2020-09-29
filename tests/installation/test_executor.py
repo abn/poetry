@@ -57,8 +57,12 @@ def mock_file_downloads(http):
 
 
 def test_execute_executes_a_batch_of_operations(
-    config, pool, io, tmp_dir, mock_file_downloads
+    mocker, config, pool, io, tmp_dir, mock_file_downloads
 ):
+    pip_editable_install = mocker.patch(
+        "poetry.installation.executor.pip_editable_install"
+    )
+
     config = Config()
     config.merge({"cache-dir": tmp_dir})
 
@@ -123,7 +127,8 @@ Package operations: 4 installs, 1 update, 1 removal
     expected = set(expected.splitlines())
     output = set(io.fetch_output().splitlines())
     assert expected == output
-    assert 5 == len(env.executed)
+    assert 4 == len(env.executed)
+    pip_editable_install.assert_called_once()
 
 
 def test_execute_shows_skipped_operations_if_verbose(config, pool, io):

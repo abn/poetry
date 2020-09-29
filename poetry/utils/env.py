@@ -39,6 +39,7 @@ from poetry.utils._compat import decode
 from poetry.utils._compat import encode
 from poetry.utils._compat import list_to_shell_command
 from poetry.utils._compat import subprocess
+from poetry.utils.helpers import temporary_directory
 from poetry.utils.toml_file import TomlFile
 
 
@@ -680,8 +681,13 @@ class EnvManager(object):
 
     @classmethod
     def build_venv(
-        cls, path, executable=None, with_pip=False
-    ):  # type: (Union[Path,str], Optional[Union[str, Path]], bool) -> virtualenv.run.session.Session
+        cls,
+        path,
+        executable=None,
+        with_pip=False,
+        with_wheel=None,
+        with_setuptools=None,
+    ):  # type: (Union[Path,str], Optional[Union[str, Path]], bool, Optional[bool], Optional[bool]) -> virtualenv.run.session.Session
         if isinstance(executable, Path):
             executable = executable.resolve().as_posix()
 
@@ -693,7 +699,16 @@ class EnvManager(object):
         ]
 
         if not with_pip:
-            opts.extend(["--no-pip", "--no-wheel", "--no-setuptools"])
+            opts.append("--no-pip")
+        else:
+            if with_wheel is None:
+                with_wheel = True
+
+        if with_wheel is None or not with_wheel:
+            opts.append("--no-wheel")
+
+        if with_setuptools is None or not with_setuptools:
+            opts.append("--no-setuptools")
 
         opts.append(str(path))
 
@@ -1248,6 +1263,21 @@ class NullEnv(SystemEnv):
 
     def _bin(self, bin):
         return bin
+
+
+@contextmanager
+def ephemeral_environment(executable=None, pip=False, wheel=None, setuptools=None):
+    with temporary_directory() as tmp_dir:
+        # TODO: cache PEP 517 build environment corresponding to each project venv
+        venv_dir = Path(tmp_dir) / ".venv"
+        EnvManager.build_venv(
+            path=venv_dir.as_posix(),
+            executable=executable,
+            with_pip=pip,
+            with_wheel=wheel,
+            with_setuptools=setuptools,
+        )
+        yield VirtualEnv(venv_dir, venv_dir)
 
 
 class MockEnv(NullEnv):
