@@ -11,8 +11,8 @@ from poetry.core.packages.project_package import ProjectPackage
 from poetry.core.packages.vcs_dependency import VCSDependency
 from poetry.inspection.info import PackageInfo
 from poetry.puzzle.provider import Provider
-from poetry.repositories.pool import Pool
-from poetry.repositories.repository import Repository
+from poetry.sources.repositories.pool import Pool
+from poetry.sources.repositories.repository import Repository
 from poetry.utils.env import EnvCommandError
 from poetry.utils.env import MockEnv as BaseMockEnv
 from tests.helpers import get_dependency

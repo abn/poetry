@@ -73,7 +73,7 @@ class AddCommand(InstallerCommand, InitCommand):
         "  - A url (<b>https://example.com/packages/my-package-0.1.0.tar.gz</b>)\n"
     )
 
-    loggers = ["poetry.repositories.pypi_repository", "poetry.inspection.info"]
+    loggers = ["poetry.sources.repositories.pypi", "poetry.inspection.info"]
 
     def handle(self) -> int:
         from tomlkit import inline_table

@@ -10,9 +10,9 @@ from cleo.io.null_io import NullIO
 from poetry.config.config import Config
 from poetry.core.packages.project_package import ProjectPackage
 from poetry.packages import Locker
-from poetry.repositories import Pool
-from poetry.repositories import Repository
-from poetry.repositories.installed_repository import InstalledRepository
+from poetry.sources.repositories.installed import InstalledRepository
+from poetry.sources.repositories.pool import Pool
+from poetry.sources.repositories.repository import Repository
 from poetry.utils.extras import get_extra_package_names
 from poetry.utils.helpers import canonicalize_name
 

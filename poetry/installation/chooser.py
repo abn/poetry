@@ -8,7 +8,7 @@ from packaging.tags import Tag
 
 from poetry.core.packages.package import Package
 from poetry.core.packages.utils.link import Link
-from poetry.repositories.pool import Pool
+from poetry.sources.repositories.pool import Pool
 from poetry.utils.env import Env
 from poetry.utils.patterns import wheel_file_re
 

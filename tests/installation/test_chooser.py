@@ -8,9 +8,9 @@ from packaging.tags import Tag
 
 from poetry.core.packages.package import Package
 from poetry.installation.chooser import Chooser
-from poetry.repositories.legacy_repository import LegacyRepository
-from poetry.repositories.pool import Pool
-from poetry.repositories.pypi_repository import PyPiRepository
+from poetry.sources.repositories.legacy import LegacyRepository
+from poetry.sources.repositories.pool import Pool
+from poetry.sources.repositories.pypi import PyPiRepository
 from poetry.utils.env import MockEnv
 
 

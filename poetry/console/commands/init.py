@@ -19,7 +19,7 @@ from .env_command import EnvCommand
 
 
 if TYPE_CHECKING:
-    from poetry.repositories import Pool
+    from poetry.sources.repositories.pool import Pool
 
 
 class InitCommand(Command):
@@ -556,8 +556,8 @@ The <c1>init</c1> command creates a basic <comment>pyproject.toml</> file in the
         return license
 
     def _get_pool(self) -> "Pool":
-        from poetry.repositories import Pool
-        from poetry.repositories.pypi_repository import PyPiRepository
+        from poetry.sources.repositories.pool import Pool
+        from poetry.sources.repositories.pypi import PyPiRepository
 
         if isinstance(self, EnvCommand):
             return self.poetry.pool

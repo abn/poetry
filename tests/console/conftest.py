@@ -9,7 +9,7 @@ from cleo.testers.application_tester import ApplicationTester
 
 from poetry.factory import Factory
 from poetry.installation.noop_installer import NoopInstaller
-from poetry.repositories import Pool
+from poetry.sources.repositories.pool import Pool
 from poetry.utils.env import MockEnv
 from tests.helpers import PoetryTestApplication
 from tests.helpers import TestExecutor
@@ -41,9 +41,7 @@ def setup(mocker, installer, installed, config, env):
     p = mocker.patch("poetry.installation.installer.Installer._get_installed")
     p.return_value = installed
 
-    p = mocker.patch(
-        "poetry.repositories.installed_repository.InstalledRepository.load"
-    )
+    p = mocker.patch("poetry.sources.repositories.installed.InstalledRepository.load")
     p.return_value = installed
 
     # Patch git module to not actually clone projects

@@ -3,9 +3,9 @@ from typing import Dict
 from typing import List
 from typing import Optional
 
-from .base_repository import BaseRepository
-from .exceptions import PackageNotFound
-from .repository import Repository
+from poetry.sources.exceptions import PackageNotFound
+from poetry.sources.repositories.repository import Repository
+from poetry.sources.source import PackageSource
 
 
 if TYPE_CHECKING:
@@ -13,12 +13,14 @@ if TYPE_CHECKING:
     from poetry.core.packages.package import Package
 
 
-class Pool(BaseRepository):
+class Pool(PackageSource):
     def __init__(
         self,
         repositories: Optional[List[Repository]] = None,
         ignore_repository_names: bool = False,
     ) -> None:
+        super().__init__(name="")
+
         if repositories is None:
             repositories = []
 
@@ -32,8 +34,6 @@ class Pool(BaseRepository):
             self.add_repository(repository)
 
         self._ignore_repository_names = ignore_repository_names
-
-        super().__init__()
 
     @property
     def repositories(self) -> List[Repository]:
@@ -173,7 +173,7 @@ class Pool(BaseRepository):
         return packages
 
     def search(self, query: str) -> List["Package"]:
-        from .legacy_repository import LegacyRepository
+        from poetry.sources.repositories.legacy import LegacyRepository
 
         results = []
         for repository in self._repositories:

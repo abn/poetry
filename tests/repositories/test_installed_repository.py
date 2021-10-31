@@ -6,7 +6,7 @@ import pytest
 from pytest_mock.plugin import MockerFixture
 
 from poetry.core.packages.package import Package
-from poetry.repositories.installed_repository import InstalledRepository
+from poetry.sources.repositories.installed import InstalledRepository
 from poetry.utils._compat import metadata
 from poetry.utils.env import MockEnv as BaseMockEnv
 from tests.compat import zipp
@@ -75,7 +75,7 @@ def repository(mocker: MockerFixture, env: MockEnv) -> InstalledRepository:
             {"remote.origin.url": "git@github.com:sdispater/pendulum.git"},
         ],
     )
-    mocker.patch("poetry.repositories.installed_repository._VENDORS", str(VENDOR_DIR))
+    mocker.patch("poetry.sources.repositories.installed._VENDORS", str(VENDOR_DIR))
     return InstalledRepository.load(env)
 
 

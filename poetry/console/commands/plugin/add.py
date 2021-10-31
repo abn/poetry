@@ -66,7 +66,7 @@ You can specify a package in the following forms:
         from poetry.core.semver.helpers import parse_constraint
         from poetry.factory import Factory
         from poetry.packages.project_package import ProjectPackage
-        from poetry.repositories.installed_repository import InstalledRepository
+        from poetry.sources.repositories.installed import InstalledRepository
         from poetry.utils.env import EnvManager
 
         plugins = self.argument("plugins")

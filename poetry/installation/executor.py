@@ -39,7 +39,7 @@ if TYPE_CHECKING:
 
     from poetry.config.config import Config
     from poetry.core.packages.package import Package
-    from poetry.repositories import Pool
+    from poetry.sources.repositories.pool import Pool
     from poetry.utils.env import Env
 
     from .operations import OperationTypes

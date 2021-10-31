@@ -16,7 +16,7 @@ from poetry.installation.executor import Executor
 from poetry.installation.operations import Install
 from poetry.installation.operations import Uninstall
 from poetry.installation.operations import Update
-from poetry.repositories.pool import Pool
+from poetry.sources.repositories.pool import Pool
 from poetry.utils.env import MockEnv
 from tests.repositories.test_pypi_repository import MockRepository
 

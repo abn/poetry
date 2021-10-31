@@ -83,7 +83,7 @@ dependencies and not including the current project, run the command with the
 <info> poetry install --no-root</info>
 """
 
-    _loggers = ["poetry.repositories.pypi_repository", "poetry.inspection.info"]
+    _loggers = ["poetry.sources.repositories.pypi", "poetry.inspection.info"]
 
     def handle(self) -> int:
         from poetry.core.masonry.utils.module import ModuleOrPackageNotFound

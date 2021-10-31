@@ -7,10 +7,10 @@ import requests
 
 from poetry.core.packages.dependency import Dependency
 from poetry.factory import Factory
-from poetry.repositories.exceptions import PackageNotFound
-from poetry.repositories.exceptions import RepositoryError
-from poetry.repositories.legacy_repository import LegacyRepository
-from poetry.repositories.legacy_repository import Page
+from poetry.sources.exceptions import PackageNotFound
+from poetry.sources.exceptions import PackageSourceError
+from poetry.sources.repositories.legacy import LegacyRepository
+from poetry.sources.repositories.simple import SimpleRepositoryPage
 
 
 try:
@@ -37,7 +37,7 @@ class MockRepository(LegacyRepository):
             return
 
         with fixture.open(encoding="utf-8") as f:
-            return Page(self._url + endpoint, f.read(), {})
+            return SimpleRepositoryPage(self._url + endpoint, f.read())
 
     def _download(self, url, dest):
         filename = urlparse.urlparse(url).path.rsplit("/")[-1]
@@ -348,7 +348,7 @@ def test_get_40x_and_returns_none(http, status_code):
 def test_get_5xx_raises(http):
     repo = MockHttpRepository({"/foo": 500}, http)
 
-    with pytest.raises(RepositoryError):
+    with pytest.raises(PackageSourceError):
         repo._get("/foo")
 
 

@@ -4,8 +4,8 @@ from cleo.io.null_io import NullIO
 
 from poetry.core.packages.project_package import ProjectPackage
 from poetry.puzzle.provider import Provider as BaseProvider
-from poetry.repositories import Pool
-from poetry.repositories import Repository
+from poetry.sources.repositories.pool import Pool
+from poetry.sources.repositories.repository import Repository
 
 
 class Provider(BaseProvider):

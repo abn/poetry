@@ -7,9 +7,9 @@ from poetry.console.exceptions import PoetrySimpleConsoleException
 from poetry.core.packages.package import Package
 from poetry.core.semver.version import Version
 from poetry.factory import Factory
-from poetry.repositories.installed_repository import InstalledRepository
-from poetry.repositories.pool import Pool
-from poetry.repositories.repository import Repository
+from poetry.sources.repositories.installed import InstalledRepository
+from poetry.sources.repositories.pool import Pool
+from poetry.sources.repositories.repository import Repository
 from poetry.utils.env import EnvManager
 
 

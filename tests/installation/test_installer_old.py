@@ -13,9 +13,9 @@ from poetry.factory import Factory
 from poetry.installation import Installer as BaseInstaller
 from poetry.installation.noop_installer import NoopInstaller
 from poetry.packages import Locker as BaseLocker
-from poetry.repositories import Pool
-from poetry.repositories import Repository
-from poetry.repositories.installed_repository import InstalledRepository
+from poetry.sources.repositories.installed import InstalledRepository
+from poetry.sources.repositories.pool import Pool
+from poetry.sources.repositories.repository import Repository
 from poetry.utils.env import MockEnv
 from poetry.utils.env import NullEnv
 from tests.helpers import get_dependency

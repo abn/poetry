@@ -9,8 +9,8 @@ from cleo.io.null_io import NullIO
 
 from poetry.core.packages.package import Package
 from poetry.installation.pip_installer import PipInstaller
-from poetry.repositories.legacy_repository import LegacyRepository
-from poetry.repositories.pool import Pool
+from poetry.sources.repositories.legacy import LegacyRepository
+from poetry.sources.repositories.pool import Pool
 from poetry.utils.env import NullEnv
 
 

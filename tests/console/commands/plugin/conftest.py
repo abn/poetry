@@ -3,8 +3,8 @@ import pytest
 from poetry.__version__ import __version__
 from poetry.core.packages.package import Package
 from poetry.factory import Factory
-from poetry.repositories.installed_repository import InstalledRepository
-from poetry.repositories.pool import Pool
+from poetry.sources.repositories.installed import InstalledRepository
+from poetry.sources.repositories.pool import Pool
 from poetry.utils.env import EnvManager
 
 

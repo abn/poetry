@@ -8,8 +8,8 @@ from poetry.core.semver.helpers import parse_constraint
 from poetry.core.toml.file import TOMLFile
 from poetry.factory import Factory
 from poetry.plugins.plugin import Plugin
-from poetry.repositories.legacy_repository import LegacyRepository
-from poetry.repositories.pypi_repository import PyPiRepository
+from poetry.sources.repositories.legacy import LegacyRepository
+from poetry.sources.repositories.pypi import PyPiRepository
 
 
 fixtures_dir = Path(__file__).parent / "fixtures"

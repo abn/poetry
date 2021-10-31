@@ -11,7 +11,7 @@ from tomlkit.items import Table
 from poetry.config.source import Source
 from poetry.console.commands.command import Command
 from poetry.factory import Factory
-from poetry.repositories import Pool
+from poetry.sources.repositories.pool import Pool
 
 
 class SourceAddCommand(Command):

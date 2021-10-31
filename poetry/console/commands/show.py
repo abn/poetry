@@ -15,8 +15,8 @@ if TYPE_CHECKING:
     from poetry.core.packages.dependency import Dependency
     from poetry.core.packages.package import Package
     from poetry.packages.project_package import ProjectPackage
-    from poetry.repositories import Repository
-    from poetry.repositories.installed_repository import InstalledRepository
+    from poetry.sources.repositories.installed import InstalledRepository
+    from poetry.sources.repositories.repository import Repository
 
 
 class ShowCommand(EnvCommand):
@@ -79,9 +79,9 @@ lists all packages available."""
         from cleo.terminal import Terminal
 
         from poetry.puzzle.solver import Solver
-        from poetry.repositories.installed_repository import InstalledRepository
-        from poetry.repositories.pool import Pool
-        from poetry.repositories.repository import Repository
+        from poetry.sources.repositories.installed import InstalledRepository
+        from poetry.sources.repositories.pool import Pool
+        from poetry.sources.repositories.repository import Repository
         from poetry.utils.helpers import get_package_version_display_string
 
         package = self.argument("package")

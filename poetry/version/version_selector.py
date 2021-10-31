@@ -7,7 +7,7 @@ from poetry.core.semver.version import Version
 
 
 if TYPE_CHECKING:
-    from poetry.repositories import Pool
+    from poetry.sources.repositories.pool import Pool
 
 
 class VersionSelector:

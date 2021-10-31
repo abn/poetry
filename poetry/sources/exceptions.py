@@ -1,4 +1,4 @@
-class RepositoryError(Exception):
+class PackageSourceError(Exception):
 
     pass
 

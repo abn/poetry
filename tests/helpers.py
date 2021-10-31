@@ -14,8 +14,8 @@ from poetry.core.vcs.git import ParsedUrl
 from poetry.factory import Factory
 from poetry.installation.executor import Executor
 from poetry.packages import Locker
-from poetry.repositories import Repository
-from poetry.repositories.exceptions import PackageNotFound
+from poetry.sources.exceptions import PackageNotFound
+from poetry.sources.repositories.repository import Repository
 from poetry.utils._compat import WINDOWS
 
 

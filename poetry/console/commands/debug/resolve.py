@@ -33,7 +33,7 @@ class DebugResolveCommand(InitCommand):
         option("install", None, "Show what would be installed for the current system."),
     ]
 
-    loggers = ["poetry.repositories.pypi_repository", "poetry.inspection.info"]
+    loggers = ["poetry.sources.repositories.pypi", "poetry.inspection.info"]
 
     def handle(self) -> Optional[int]:
         from cleo.io.null_io import NullIO
@@ -41,8 +41,8 @@ class DebugResolveCommand(InitCommand):
         from poetry.core.packages.project_package import ProjectPackage
         from poetry.factory import Factory
         from poetry.puzzle import Solver
-        from poetry.repositories.pool import Pool
-        from poetry.repositories.repository import Repository
+        from poetry.sources.repositories.pool import Pool
+        from poetry.sources.repositories.repository import Repository
         from poetry.utils.env import EnvManager
 
         packages = self.argument("package")

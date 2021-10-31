@@ -16,11 +16,11 @@ from poetry.packages.locker import Locker
 from poetry.packages.project_package import ProjectPackage
 from poetry.plugins.plugin_manager import PluginManager
 from poetry.poetry import Poetry
-from poetry.repositories.pypi_repository import PyPiRepository
+from poetry.sources.repositories.pypi import PyPiRepository
 
 
 if TYPE_CHECKING:
-    from .repositories.legacy_repository import LegacyRepository
+    from poetry.sources.repositories.legacy import LegacyRepository
 
 
 class Factory(BaseFactory):
@@ -163,7 +163,7 @@ class Factory(BaseFactory):
     def create_legacy_repository(
         cls, source: Dict[str, str], auth_config: Config
     ) -> "LegacyRepository":
-        from .repositories.legacy_repository import LegacyRepository
+        from .sources.repositories.legacy import LegacyRepository
         from .utils.helpers import get_cert
         from .utils.helpers import get_client_cert
 

@@ -9,11 +9,11 @@ from poetry.core.poetry import Poetry as BasePoetry
 
 if TYPE_CHECKING:
     from poetry.core.packages.project_package import ProjectPackage
+    from poetry.sources.repositories.pool import Pool
 
     from .config.config import Config
     from .packages.locker import Locker
     from .plugins.plugin_manager import PluginManager
-    from .repositories.pool import Pool
 
 
 class Poetry(BasePoetry):
@@ -28,7 +28,7 @@ class Poetry(BasePoetry):
         locker: "Locker",
         config: "Config",
     ):
-        from .repositories.pool import Pool  # noqa
+        from poetry.sources.repositories.pool import Pool
 
         super(Poetry, self).__init__(file, local_config, package)
 

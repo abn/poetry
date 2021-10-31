@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from poetry.core.semver.version import Version
-from poetry.repositories.legacy_repository import LegacyRepository
+from poetry.sources.repositories.legacy import LegacyRepository
 from tests.helpers import get_dependency
 from tests.helpers import get_package
 

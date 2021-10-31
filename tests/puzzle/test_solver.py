@@ -13,9 +13,9 @@ from poetry.factory import Factory
 from poetry.puzzle import Solver
 from poetry.puzzle.exceptions import SolverProblemError
 from poetry.puzzle.provider import Provider as BaseProvider
-from poetry.repositories.installed_repository import InstalledRepository
-from poetry.repositories.pool import Pool
-from poetry.repositories.repository import Repository
+from poetry.sources.repositories.installed import InstalledRepository
+from poetry.sources.repositories.pool import Pool
+from poetry.sources.repositories.repository import Repository
 from poetry.utils.env import MockEnv
 from tests.helpers import get_dependency
 from tests.helpers import get_package

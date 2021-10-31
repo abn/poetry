@@ -15,7 +15,7 @@ from ..command import Command
 if TYPE_CHECKING:
     from poetry.core.packages.package import Package
     from poetry.core.semver.version import Version
-    from poetry.repositories.pool import Pool
+    from poetry.sources.repositories.pool import Pool
 
 
 class SelfUpdateCommand(Command):
@@ -75,8 +75,8 @@ class SelfUpdateCommand(Command):
         if self._pool is not None:
             return self._pool
 
-        from poetry.repositories.pool import Pool
-        from poetry.repositories.pypi_repository import PyPiRepository
+        from poetry.sources.repositories.pool import Pool
+        from poetry.sources.repositories.pypi import PyPiRepository
 
         pool = Pool()
         pool.add_repository(PyPiRepository())
@@ -172,7 +172,7 @@ class SelfUpdateCommand(Command):
         from poetry.core.packages.project_package import ProjectPackage
         from poetry.installation.installer import Installer
         from poetry.packages.locker import NullLocker
-        from poetry.repositories.installed_repository import InstalledRepository
+        from poetry.sources.repositories.installed import InstalledRepository
         from poetry.utils.env import EnvManager
 
         env = EnvManager.get_system_env()

@@ -21,8 +21,8 @@ from poetry.inspection.info import PackageInfo
 from poetry.inspection.info import PackageInfoError
 from poetry.installation import Installer
 from poetry.layouts import layout
-from poetry.repositories import Pool
-from poetry.repositories import Repository
+from poetry.sources.repositories.pool import Pool
+from poetry.sources.repositories.repository import Repository
 from poetry.utils.env import EnvManager
 from poetry.utils.env import SystemEnv
 from poetry.utils.env import VirtualEnv
@@ -169,7 +169,7 @@ def download_mock(mocker):
     # Patch download to not download anything but to just copy from fixtures
     mocker.patch("poetry.utils.helpers.download_file", new=mock_download)
     mocker.patch("poetry.puzzle.provider.download_file", new=mock_download)
-    mocker.patch("poetry.repositories.pypi_repository.download_file", new=mock_download)
+    mocker.patch("poetry.sources.http.download_file", new=mock_download)
 
 
 @pytest.fixture(autouse=True)

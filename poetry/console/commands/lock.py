@@ -28,7 +28,7 @@ file.
 <info>poetry lock</info>
 """
 
-    loggers = ["poetry.repositories.pypi_repository"]
+    loggers = ["poetry.sources.repositories.pypi"]
 
     def handle(self) -> int:
         self._installer.use_executor(

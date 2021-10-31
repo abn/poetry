@@ -25,7 +25,7 @@ class UpdateCommand(InstallerCommand):
         option("lock", None, "Do not perform operations (only update the lockfile)."),
     ]
 
-    loggers = ["poetry.repositories.pypi_repository"]
+    loggers = ["poetry.sources.repositories.pypi"]
 
     def handle(self) -> int:
         packages = self.argument("packages")

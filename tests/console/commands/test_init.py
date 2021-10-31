@@ -8,7 +8,7 @@ import pytest
 
 from cleo.testers.command_tester import CommandTester
 
-from poetry.repositories import Pool
+from poetry.sources.repositories.pool import Pool
 from poetry.utils._compat import decode
 from tests.helpers import PoetryTestApplication
 from tests.helpers import get_package

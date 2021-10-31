@@ -12,7 +12,7 @@ from cleo.io.io import IO
 
 from poetry.core.pyproject.toml import PyProjectTOML
 from poetry.installation.base_installer import BaseInstaller
-from poetry.repositories.pool import Pool
+from poetry.sources.repositories.pool import Pool
 from poetry.utils._compat import encode
 from poetry.utils.env import Env
 from poetry.utils.helpers import safe_rmtree
