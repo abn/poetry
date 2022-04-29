@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import contextlib
+import dataclasses
+import functools
 import logging
 import time
 import urllib.parse
@@ -34,6 +36,27 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
+@dataclasses.dataclass
+class AuthenticatorRepositoryConfig:
+    name: str
+    url: str
+    netloc: str = dataclasses.field(init=False)
+    path: str = dataclasses.field(init=False)
+    cert: Path | None = dataclasses.field(default=None)
+    client_cert: Path | None = dataclasses.field(default=None)
+
+    def __post_init__(self) -> None:
+        parsed_url = urllib.parse.urlsplit(self.url)
+        self.netloc = parsed_url.netloc
+        self.path = parsed_url.path
+
+    def certs(self, config: Config) -> dict[str, Path | None]:
+        return {
+            "cert": get_client_cert(config, self.name),
+            "verify": get_cert(config, self.name),
+        }
+
+
 class Authenticator:
     def __init__(
         self,
@@ -48,6 +71,9 @@ class Authenticator:
         self._sessions_for_netloc: dict[str, requests.Session] = {}
         self._credentials: dict[str, tuple[str, str]] = {}
         self._certs: dict[str, dict[str, Path | None]] = {}
+        self._configured_repositories: dict[
+            str, AuthenticatorRepositoryConfig
+        ] | None = None
         self._password_manager = PasswordManager(self._config)
         self._cache_control = (
             FileCache(
@@ -186,12 +212,12 @@ class Authenticator:
         netloc = parsed_url.netloc
 
         credentials: tuple[str | None, str | None] = self._credentials.get(
-            netloc, (None, None)
+            url, (None, None)
         )
 
         if credentials == (None, None):
             if "@" not in netloc:
-                credentials = self._get_credentials_for_netloc(netloc)
+                credentials = self._get_credentials_for_url(url)
             else:
                 # Split from the right because that's how urllib.parse.urlsplit()
                 # behaves if more than one @ is present (which can be checked using
@@ -208,7 +234,7 @@ class Authenticator:
 
         if any(credential is not None for credential in credentials):
             credentials = (credentials[0] or "", credentials[1] or "")
-            self._credentials[netloc] = credentials
+            self._credentials[url] = credentials
 
         return credentials
 
@@ -216,74 +242,75 @@ class Authenticator:
         return self._password_manager.get_pypi_token(name)
 
     def get_http_auth(self, name: str) -> dict[str, str | None] | None:
-        return self._get_http_auth(name, None)
+        if name == "pypi":
+            repository = AuthenticatorRepositoryConfig(
+                name, "https://upload.pypi.org/legacy/"
+            )
+        else:
+            if name not in self.configured_repositories:
+                return None
+            repository = self.configured_repositories[name]
+
+        return self._get_http_auth(repository)
+
+    @property
+    def configured_repositories(self) -> dict[str, AuthenticatorRepositoryConfig]:
+        if self._configured_repositories is None:
+            self._configured_repositories = {}
+            for repository in self._get_repository_configs():
+                self._configured_repositories[repository.name] = repository
+        return self._configured_repositories
 
     def _get_http_auth(
-        self, name: str, netloc: str | None
+        self, repository: AuthenticatorRepositoryConfig
     ) -> dict[str, str | None] | None:
-        if name == "pypi":
-            url = "https://upload.pypi.org/legacy/"
-        else:
-            url = self._config.get(f"repositories.{name}.url")
-            if not url:
-                return None
+        auth = self._password_manager.get_http_auth(repository.name)
+        auth = auth or {}
 
-        parsed_url = urllib.parse.urlsplit(url)
+        if auth.get("password") is None:
+            username = auth.get("username")
+            auth = self._get_credentials_for_repository_from_keyring(
+                repository, username
+            )
 
-        if netloc is None or netloc == parsed_url.netloc:
-            auth = self._password_manager.get_http_auth(name)
-            auth = auth or {}
+        return auth
 
-            if auth.get("password") is None:
-                username = auth.get("username")
-                auth = self._get_credentials_for_netloc_from_keyring(
-                    url, parsed_url.netloc, username
-                )
+    def _get_credentials_for_url(self, url: str) -> tuple[str | None, str | None]:
+        repository = self._get_repository_config_for_url(url)
 
-            return auth
+        if repository:
+            auth = self._get_http_auth(repository)
 
-        return None
-
-    def _get_credentials_for_netloc(self, netloc: str) -> tuple[str | None, str | None]:
-        for repository_name, _ in self._get_repository_netlocs():
-            auth = self._get_http_auth(repository_name, netloc)
-
-            if auth is None:
-                continue
-
-            return auth.get("username"), auth.get("password")
+            if auth is not None:
+                return auth.get("username"), auth.get("password")
 
         return None, None
 
     def get_certs_for_url(self, url: str) -> dict[str, Path | None]:
-        parsed_url = urllib.parse.urlsplit(url)
-
-        netloc = parsed_url.netloc
-
         return self._certs.setdefault(
-            netloc,
-            self._get_certs_for_netloc_from_config(netloc),
+            url,
+            self._get_certs_for_url_from_config(url),
         )
 
-    def _get_repository_netlocs(self) -> Iterator[tuple[str, str]]:
+    def _get_repository_configs(self) -> Iterator[AuthenticatorRepositoryConfig]:
         for repository_name in self._config.get("repositories", []):
             url = self._config.get(f"repositories.{repository_name}.url")
-            parsed_url = urllib.parse.urlsplit(url)
-            yield repository_name, parsed_url.netloc
+            yield AuthenticatorRepositoryConfig(repository_name, url)
 
-    def _get_credentials_for_netloc_from_keyring(
-        self, url: str, netloc: str, username: str | None
+    @staticmethod
+    def _get_credentials_for_repository_from_keyring(
+        repository: AuthenticatorRepositoryConfig, username: str | None
     ) -> dict[str, str | None] | None:
         import keyring
 
-        cred = keyring.get_credential(url, username)
+        cred = keyring.get_credential(repository.url, username)
         if cred is not None:
             return {
                 "username": cred.username,
                 "password": cred.password,
             }
 
-        cred = keyring.get_credential(netloc, username)
+        cred = keyring.get_credential(repository.netloc, username)
         if cred is not None:
             return {
                 "username": cred.username,
@@ -298,13 +325,37 @@ class Authenticator:
 
         return None
 
-    def _get_certs_for_netloc_from_config(self, netloc: str) -> dict[str, Path | None]:
-        certs: dict[str, Path | None] = {"cert": None, "verify": None}
+    @functools.lru_cache(maxsize=None)
+    def _get_repository_config_for_url(
+        self, url: str
+    ) -> AuthenticatorRepositoryConfig | None:
+        parsed_url = urllib.parse.urlsplit(url)
+        candidates_netloc_only = []
+        candidates_path_match = []
 
-        for repository_name, repository_netloc in self._get_repository_netlocs():
-            if netloc == repository_netloc:
-                certs["cert"] = get_client_cert(self._config, repository_name)
-                certs["verify"] = get_cert(self._config, repository_name)
-                break
+        for repository in self.configured_repositories.values():
+            if repository.netloc == parsed_url.netloc:
+                if parsed_url.path.startswith(repository.path):
+                    candidates_path_match.append(repository)
+                    continue
+                candidates_netloc_only.append(repository)
 
-        return certs
+        if candidates_path_match:
+            candidates_path_match.sort(key=lambda c: len(c.path), reverse=True)
+            return candidates_path_match[0]
+        elif candidates_netloc_only:
+            if len(candidates_netloc_only) > 1:
+                logger.debug(
+                    "Multiple source configurations found for %s - %s",
+                    parsed_url.netloc,
+                    ", ".join(map(lambda c: c.name, candidates_netloc_only)),
+                )
+            return candidates_netloc_only[0]
+
+        return None
+
+    def _get_certs_for_url_from_config(self, url: str) -> dict[str, Path | None]:
+        selected = self._get_repository_config_for_url(url)
+        if selected:
+            return selected.certs(config=self._config)
+        return {"cert": None, "verify": None}

@@ -76,7 +76,7 @@ class Publisher:
             self._poetry.config, repository_name
         )
         # Requesting missing credentials but only if there is not a client cert defined.
-        if not resolved_client_cert:
+        if not resolved_client_cert and hasattr(self._io, "ask"):
             if username is None:
                 username = self._io.ask("Username:")
 

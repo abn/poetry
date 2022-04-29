@@ -352,3 +352,130 @@ def test_authenticator_uses_certs_from_config_if_not_provided(
 
     assert Path(kwargs["verify"]) == Path(cert or configured_cert)
     assert Path(kwargs["cert"]) == Path(client_cert or configured_client_cert)
+
+
+def test_authenticator_uses_credentials_from_config_matched_by_url_path(
+    config: Config, mock_remote: None, http: type[httpretty.httpretty]
+):
+    config.merge(
+        {
+            "repositories": {
+                "foo-alpha": {"url": "https://foo.bar/alpha/files/simple/"},
+                "foo-beta": {"url": "https://foo.bar/beta/files/simple/"},
+            },
+            "http-basic": {
+                "foo-alpha": {"username": "bar", "password": "alpha"},
+                "foo-beta": {"username": "baz", "password": "beta"},
+            },
+        }
+    )
+
+    authenticator = Authenticator(config, NullIO())
+    authenticator.request("get", "https://foo.bar/alpha/files/simple/foo-0.1.0.tar.gz")
+
+    request = http.last_request()
+
+    assert request.headers["Authorization"] == "Basic YmFyOmFscGhh"
+
+    # Make request on second repository with the same netloc but different credentials
+    authenticator.request("get", "https://foo.bar/beta/files/simple/foo-0.1.0.tar.gz")
+
+    request = http.last_request()
+
+    assert request.headers["Authorization"] == "Basic YmF6OmJldGE="
+
+
+def test_authenticator_uses_credentials_from_config_with_at_sign_in_path(
+    config: Config, mock_remote: None, http: type[httpretty.httpretty]
+):
+    config.merge(
+        {
+            "repositories": {
+                "foo": {"url": "https://foo.bar/beta/files/simple/"},
+            },
+            "http-basic": {
+                "foo": {"username": "bar", "password": "baz"},
+            },
+        }
+    )
+    authenticator = Authenticator(config, NullIO())
+    authenticator.request("get", "https://foo.bar/beta/files/simple/f@@-0.1.0.tar.gz")
+
+    request = http.last_request()
+
+    assert request.headers["Authorization"] == "Basic YmFyOmJheg=="
+
+
+def test_authenticator_falls_back_to_keyring_url_matched_by_path(
+    config: Config,
+    mock_remote: None,
+    http: type[httpretty.httpretty],
+    with_simple_keyring: None,
+    dummy_keyring: DummyBackend,
+):
+    config.merge(
+        {
+            "repositories": {
+                "foo-alpha": {"url": "https://foo.bar/alpha/files/simple/"},
+                "foo-beta": {"url": "https://foo.bar/beta/files/simple/"},
+            }
+        }
+    )
+
+    dummy_keyring.set_password(
+        "https://foo.bar/alpha/files/simple/", None, SimpleCredential(None, "bar")
+    )
+    dummy_keyring.set_password(
+        "https://foo.bar/beta/files/simple/", None, SimpleCredential(None, "baz")
+    )
+
+    authenticator = Authenticator(config, NullIO())
+
+    authenticator.request("get", "https://foo.bar/alpha/files/simple/foo-0.1.0.tar.gz")
+    request = http.last_request()
+
+    assert request.headers["Authorization"] == "Basic OmJhcg=="
+
+    authenticator.request("get", "https://foo.bar/beta/files/simple/foo-0.1.0.tar.gz")
+    request = http.last_request()
+
+    assert request.headers["Authorization"] == "Basic OmJheg=="
+
+
+@pytest.fixture
+def environment_repository_credentials_multiple_repositories(
+    monkeypatch: MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("POETRY_HTTP_BASIC_FOO_ALPHA_USERNAME", "bar")
+    monkeypatch.setenv("POETRY_HTTP_BASIC_FOO_ALPHA_PASSWORD", "alpha")
+    monkeypatch.setenv("POETRY_HTTP_BASIC_FOO_BETA_USERNAME", "baz")
+    monkeypatch.setenv("POETRY_HTTP_BASIC_FOO_BETA_PASSWORD", "beta")
+
+
+def test_authenticator_uses_env_provided_credentials_matched_by_url_path(
+    config: Config,
+    environ: None,
+    mock_remote: type[httpretty.httpretty],
+    http: type[httpretty.httpretty],
+    environment_repository_credentials_multiple_repositories: None,
+):
+    config.merge(
+        {
+            "repositories": {
+                "foo-alpha": {"url": "https://foo.bar/alpha/files/simple/"},
+                "foo-beta": {"url": "https://foo.bar/beta/files/simple/"},
+            }
+        }
+    )
+
+    authenticator = Authenticator(config, NullIO())
+
+    authenticator.request("get", "https://foo.bar/alpha/files/simple/foo-0.1.0.tar.gz")
+    request = http.last_request()
+
+    assert request.headers["Authorization"] == "Basic YmFyOmFscGhh"
+
+    authenticator.request("get", "https://foo.bar/beta/files/simple/foo-0.1.0.tar.gz")
+    request = http.last_request()
+
+    assert request.headers["Authorization"] == "Basic YmF6OmJldGE="
