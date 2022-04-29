@@ -157,8 +157,6 @@ class Factory(BaseFactory):
         cls, source: dict[str, str], auth_config: Config
     ) -> LegacyRepository:
         from poetry.repositories.legacy_repository import LegacyRepository
-        from poetry.utils.helpers import get_cert
-        from poetry.utils.helpers import get_client_cert
 
         if "url" not in source:
             raise RuntimeError("Unsupported source specified")
@@ -173,8 +171,6 @@ class Factory(BaseFactory):
             name,
             url,
             config=auth_config,
-            cert=get_cert(auth_config, name),
-            client_cert=get_client_cert(auth_config, name),
         )
 
     @classmethod
