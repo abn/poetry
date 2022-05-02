@@ -264,8 +264,7 @@ class Authenticator:
     def _get_http_auth(
         self, repository: AuthenticatorRepositoryConfig
     ) -> dict[str, str | None] | None:
-        auth = self._password_manager.get_http_auth(repository.name)
-        auth = auth or {}
+        auth = self._password_manager.get_http_auth(repository.name) or {}
 
         if auth.get("password") is None:
             username = auth.get("username")
