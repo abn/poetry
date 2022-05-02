@@ -111,7 +111,7 @@ class Config:
         for env_key in os.environ.keys():
             match = pattern.match(env_key)
             if match:
-                repositories[match.group("name").lower()] = {"url": os.environ[env_key]}
+                repositories[match.group("name").lower(). replace ("_", "-")] = {"url": os.environ[env_key]}
 
         return repositories
 
