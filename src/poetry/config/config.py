@@ -106,7 +106,7 @@ class Config:
     @staticmethod
     def _get_environment_repositories() -> dict[str, dict[str, str]]:
         repositories = {}
-        pattern = re.compile(r"POETRY_REPOSITORIES_(?P<name>[A-Z]+)_URL")
+        pattern = re.compile(r"POETRY_REPOSITORIES_(?P<name>[A-Z_]+)_URL")
 
         for env_key in os.environ.keys():
             match = pattern.match(env_key)
